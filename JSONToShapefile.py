@@ -3,29 +3,33 @@
 Created on Sat Jul 16 06:33:00 2016
 
 @author: MStelmach
-
-
 """
 
 from osgeo import ogr,osr
 import simplejson
 
+#Define input and output
 input_file = 'H:\MyDocuments\UW\CapstoneProject\scripts\workingstravasegments20160724.txt'
 output_shapefile = 'H:\MyDocuments\UW\CapstoneProject\NatCapData\Strava\MBSStravaSegmentsFROMJSON20160726.shp'
 
+#Read text file input from Strava Scraper
 reader = open(input_file, 'r')
 
+#read the json into memory
 segmentdict = simplejson.loads(reader.read())
 
 fmt = '%Y-%m-%dT%H:%M:%S.%f' #iso date format input
 
+#set working parameters for ogr
 driver = ogr.GetDriverByName("ESRI Shapefile")
 srs = osr.SpatialReference()
 srs.SetWellKnownGeogCS("WGS84") #WGS 84 decimal degrees http://spatialreference.org/ref/epsg/wgs-84/
 
+#create driver for shapefile creation
 data_source = driver.CreateDataSource(output_shapefile)
 layer = data_source.CreateLayer("StravaSegs", srs, ogr.wkbMultiLineString)
 
+#Create fields for new shapefile
 field_name = ogr.FieldDefn("Name", ogr.OFTString)
 field_name.SetWidth(50)
 layer.CreateField(field_name)
@@ -47,9 +51,12 @@ field_bounds.SetWidth(100)
 layer.CreateField(field_bounds)
 layer.CreateField(ogr.FieldDefn("Dist", ogr.OFTReal))
 
+#Read lines from well known text into shapefile
 for line in segmentdict:
     this = segmentdict[line]
     wkt = this['wkt'] #return the coordinates within the list
+
+    #test to see the file has an associated shape
     if wkt:
         athletes = this['athletecount']
         usetype = this['usetype']
@@ -75,6 +82,7 @@ for line in segmentdict:
         feature.SetField("Bounds", bounds)
         feature.SetField("Dist", dist)
 
+        #Create line segments
         polyline = ogr.CreateGeometryFromWkt(wkt)
         feature.SetGeometry(polyline) #Set geometry to of line feature
         layer.CreateFeature(feature) #Create in shapefile

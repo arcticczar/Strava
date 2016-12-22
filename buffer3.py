@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Creating a buffer for polyline trail data.
+Creating a buffer for polyline trail data via open source ogr.
 Created on Thu Jun 30 17:46:56 2016
 Draws from:
 https://pcjericks.github.io/py-gdalogr-cookbook/vector_layers.html#create-buffer
@@ -9,9 +9,12 @@ https://github.com/OSGeo/gdal/blob/trunk/gdal/swig/python/samples/gdalcopyproj.p
 @author: MStelmach
 """
 
-import ogr, os, shutil
+import os
+import shutil
 
+import ogr
 
+#Set input shapefile and output
 daShapefile = r"H:\MyDocuments\UW\CapstoneProject\NatCapData\from_dave-2016-07-22\from_dave\mbs_trails_infra-grouped_v3\mbs_trails_infra-grouped_v3.shp"
 output = r"H:\MyDocuments\UW\CapstoneProject\NatCapData\FinalData\trailbuffer500m.shp"
 
@@ -36,12 +39,13 @@ def createBuffer(inputfn, outputBufferfn, bufferDist):
     #read fields in input file
     fieldlist = []
     for i in range(inputlyrdef.GetFieldCount()):
+        #get input field properties
         fieldname =  inputlyrdef.GetFieldDefn(i).GetName()
         fieldTypeCode = inputlyrdef.GetFieldDefn(i).GetType()
-        #fieldType = inputlyrdef.GetFieldDefn(i).GetFieldTypeName(fieldTypeCode)
         fieldWidth = inputlyrdef.GetFieldDefn(i).GetWidth()
         Getprecision = inputlyrdef.GetFieldDefn(i).GetPrecision()
         
+        #read fields into new field holder fieldlist
         fieldlist.append(fieldname)
         
         newfield = ogr.FieldDefn(fieldname, fieldTypeCode)
@@ -76,6 +80,7 @@ def main(inputfn, outputBufferfn, bufferDist):
 if __name__ == "__main__":
     inputfn = daShapefile
     outputBufferfn = output
+    #set buffer size
     bufferDist = 500.0
     
     #run buffer
