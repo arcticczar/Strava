@@ -30,25 +30,35 @@ data_source = driver.CreateDataSource(output_shapefile)
 layer = data_source.CreateLayer("StravaSegs", srs, ogr.wkbMultiLineString)
 
 #Create fields for new shapefile
+#Set name field
 field_name = ogr.FieldDefn("Name", ogr.OFTString)
 field_name.SetWidth(50)
-layer.CreateField(field_name)
+layer.CreateField(field_name) #Create name field
+#Set segment ID field
 field_StravaID = ogr.FieldDefn( "StravaID", ogr.OFTInteger)
 field_StravaID.SetWidth(12)
-layer.CreateField(field_StravaID)
+layer.CreateField(field_StravaID)#Create segment ID
+#Set use type (run or cycle)
 field_useType = ogr.FieldDefn( "UseType", ogr.OFTString)
 field_useType.SetWidth(12)
-layer.CreateField(field_useType)
+layer.CreateField(field_useType)#Create use type
+#Set Creation Date (date segment was created)
 field_CreateDate = ogr.FieldDefn("C_Date", ogr.OFTInteger)
-layer.CreateField(field_CreateDate)
+layer.CreateField(field_CreateDate) #Create Creation Date
+#Set timedelta field (difference between time created
+#and time the segment was scraped).
 field_TimeDelt = ogr.FieldDefn("TimeDelt", ogr.OFTReal)
-layer.CreateField(field_TimeDelt)
+layer.CreateField(field_TimeDelt)#Create timedelta
+#Create efforts field (count of segment uses)
 layer.CreateField(ogr.FieldDefn("Efforts", ogr.OFTInteger))
+#Create use rate field (uses/total time)
 layer.CreateField(ogr.FieldDefn("Use_Rate", ogr.OFTReal))
+#Athelete count field(number of users)
 layer.CreateField(ogr.FieldDefn("Ath_Cnt", ogr.OFTInteger))
+#Boundary box
 field_bounds = ogr.FieldDefn("Bounds", ogr.OFTString)
 field_bounds.SetWidth(100)
-layer.CreateField(field_bounds)
+layer.CreateField(field_bounds) #create bounding box
 layer.CreateField(ogr.FieldDefn("Dist", ogr.OFTReal))
 
 #Read lines from well known text into shapefile
@@ -58,6 +68,7 @@ for line in segmentdict:
 
     #test to see the file has an associated shape
     if wkt:
+	#If the segment exists, create a feature from the dictionary
         athletes = this['athletecount']
         usetype = this['usetype']
         efforts = this['effortcount']
